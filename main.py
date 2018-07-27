@@ -54,7 +54,7 @@ def nicknames(name):
                  "chris pikula": "Meddling Mage",
                  "superman": "Morphling",
                  "gitgud frog": "The Gitrog Monster",
-                 "poyser": "Doomed Traveller",
+                 "poyser": "Doomed Traveler",
                  "bourne": "Look at me I'm the DCI",
                  "luke": "Splinter Twin",
                  "ged": "Grimgrin",
