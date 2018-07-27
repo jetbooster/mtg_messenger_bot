@@ -16,3 +16,6 @@ Simple Facebook messenger listener for posting magic cards into either one-on-on
     * second line: password
   * Run the bot with `python3 main.py`
   * summon the bot using `[[cardname]]`. It has pretty decent fuzzy match, but it's not a miracle worker!
+  
+## Acknowledgements
+Thanks to XSlicer, and his work on MTG Card Fetcher for reddit, where I pulled some of the regex and logic.https://github.com/XSlicer
