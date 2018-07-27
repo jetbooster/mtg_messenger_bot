@@ -1,6 +1,7 @@
 # -*- coding: UTF-8 -*-
 
 import re
+import os
 import sys
 import json
 from requests import get
@@ -8,6 +9,14 @@ from difflib import SequenceMatcher
 
 from fbchat import log, Client
 from fbchat.models import *
+
+YOUR_FACEBOOK_EMAIL = "YOUR EMAIL HERE"
+
+if "MTG_BOT_PASSWORD" in os.environ:
+    YOUR_FACEBOOK_PASSWORD = os.environ.get('MTG_BOT_PASSWORD')
+else:
+    print("Set your password using environment variables! `MTG_BOT_PASSWORD=password python main.py` no space around '='")
+    sys.exit(1)
 
 
 # Main regex for detecting bot call. [[content]]
@@ -85,10 +94,5 @@ class MtgBot(Client):
                     self.sendRemoteImage(cardData['imageurl'],message=Message(text='mtgbot: '+cardData['name']), thread_id=thread_id, thread_type=thread_type)
 
 
-
-
-
-
-
-client = MtgBot("YOUR_FACEBOOK_EMAIL", "YOUR_FACEBOOK_PASSWORD")
+client = MtgBot(YOUR_FACEBOOK_EMAIL, YOUR_FACEBOOK_PASSWORD)
 client.listen()
