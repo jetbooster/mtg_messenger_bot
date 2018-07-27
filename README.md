@@ -13,6 +13,9 @@ Simple Facebook messenger listener for posting magic cards into either one-on-on
   * edit main.py to contain your facebook email
   * run the bot, passing in an environment variable containing your Facebook password
     ```
+    Linux:
     MTG_BOT_PASSWORD=password python main.py
+    Windows:
+    set "MTG_BOT_PASSWORD=password" & python main.py & set "MTG_BOT_PASSWORD=" //remove password from env as soon as possible
     ```
   * summon the bot using `[[cardname]]`. It has pretty decent fuzzy match, but it's not a miracle worker!
