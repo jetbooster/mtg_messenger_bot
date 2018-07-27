@@ -1,28 +1,23 @@
 # -*- coding: UTF-8 -*-
 
 import re
-import os
-import sys
 import json
 from requests import get
 from difflib import SequenceMatcher
 
-from fbchat import log, Client
-from fbchat.models import *
+from fbchat import Client
+from fbchat.models import Message
 
-YOUR_FACEBOOK_EMAIL = "YOUR EMAIL HERE"
+YOUR_FACEBOOK_USERNAME = ""
+YOUR_FACEBOOK_PASSWORD = ""
 
-if "MTG_BOT_PASSWORD" in os.environ:
-    YOUR_FACEBOOK_PASSWORD = os.environ.get('MTG_BOT_PASSWORD')
-else:
-    print("Set your password using environment variables! `MTG_BOT_PASSWORD=password python main.py` no space around '='")
-    sys.exit(1)
+with open('credentials.txt') as fyl:
+    YOUR_FACEBOOK_USERNAME = fyl.readline().strip()
+    YOUR_FACEBOOK_PASSWORD = fyl.readline().strip()
 
 
 # Main regex for detecting bot call. [[content]]
 MainRegex = re.compile(r"(?<=\[\[)(.*?)(?=\]\])")
-
-# regex for detecting short names, which should take precedence over 'blahblah of {name}'
 
 
 def mtgJson(name):
@@ -33,7 +28,55 @@ def mtgJson(name):
         print("samus.nl api call error")
         return False
 
-def properNames(corseMatch,name):
+
+def nicknames(name):
+    try:
+        nicks = {"bob": "Dark Confidant",
+                 "gary": "Gray Merchant of Asphodel",
+                 "sad robot": "Solemn Simulacrum",
+                 "jens": "Solemn Simulacrum",
+                 "bolt": "Lightning Bolt",
+                 "path": "Path to Exile",
+                 "snappy": "Snapcaster Mage",
+                 "tiago chan": "Snapcaster Mage",
+                 "goyf": "Tarmogoyf",
+                 "taylor swift": "Monastery Swiftspear",
+                 "mom": "Mother of Runes",
+                 "bfm": "B.F.M. (Big Furry Monster)",
+                 "i can't even": "Void Winnower",
+                 "durdle turtle": "Meandering Towershell",
+                 "tim": "Prodigal Sorcerer",
+                 "ernie": "Ernham Djinn",
+                 "wog": "Wrath of God",
+                 "finkel": "Shadowmage Infiltrator",
+                 "jon finkel": "Shadowmage Infiltrator",
+                 "titi": "Thing in the Ice",
+                 "chris pikula": "Meddling Mage",
+                 "superman": "Morphling",
+                 "gitgud frog": "The Gitrog Monster",
+                 "poyser": "Doomed Traveller",
+                 "bourne": "Look at me I'm the DCI",
+                 "luke": "Splinter Twin",
+                 "ged": "Grimgrin",
+                 "simoon": "Omniscience",
+                 "lyndon": "Rakdos, Lord",
+                 "ben": "Narset, Enlightened",
+                 "josh": "Sowing Salt",
+                 "chris": "capsize",
+                 "robinson": "Derevi",
+                 "merrison": "General Tazri",
+                 "science": "Enter the Infinite",
+                 "skittles": "Skithiryx",
+                 "baby jace": "Jace, Vryn",
+                 "lotv": "Liliana of the Veil",
+                 "jarvis": "Reclusive Artificer"
+                 }
+        return nicks[name.lower()]
+    except KeyError:
+        return name
+
+
+def properNames(corseMatch, name):
     # Can probably improve this so it returns the proper capitalisations
     # for now standardise as lowercase
     corseMatchLower = [l.lower() for l in corseMatch]
@@ -44,7 +87,8 @@ def properNames(corseMatch,name):
     else:
         return corseMatchLower
 
-def sequenceMatch(closeMatch,name):
+
+def sequenceMatch(closeMatch, name):
     score = 0
     best = ""
     for i in closeMatch:
@@ -54,6 +98,7 @@ def sequenceMatch(closeMatch,name):
             score = newscore
     return best
 
+
 def scryfall(name):
     try:
         scryfall = json.loads(get("https://api.scryfall.com/cards/search?q={}".format(name)).text)
@@ -61,38 +106,55 @@ def scryfall(name):
         return scryfall['data'][0]['image_uris']['normal'].split("?")[0]
     except:
         print("scryfall api call error")
-        raise
         return False
+
 
 def cardFetch(name):
     corseMatch = mtgJson(name)
-    closeMatch = properNames(corseMatch,name)
-    fineMatch = sequenceMatch(closeMatch,name)
-    print("Entered name:{}, Best Match:{}".format(name,fineMatch))
+    closeMatch = properNames(corseMatch, name)
+    fineMatch = sequenceMatch(closeMatch, name)
+    print(corseMatch)
+    print(closeMatch)
+    print(fineMatch)
+    print("Entered name:{}, Best Match:{}".format(name, fineMatch))
     imageUrl = scryfall(fineMatch)
     if imageUrl:
-        return {'imageurl':imageUrl,'name':name}
+        return {'imageurl': imageUrl, 'name': name}
     else:
         # If we get here either something went wrong or there as simply no cards with those names
         return False
 
 # Subclass fbchat.Client and override required methods
+
+
 class MtgBot(Client):
-    def _uploadImage(self,image_path, data, mimetype):
-        #mimetype seems a but flakey, force it to be image/jpeg
-        return super(MtgBot,self)._uploadImage(image_path, data, "image/jpeg")
+    def _uploadImage(self, image_path, data, mimetype):
+        # mimetype seems a but flakey, force it to be image/jpeg
+        return super(MtgBot, self)._uploadImage(image_path, data, "image/jpeg")
 
     def onMessage(self, author_id, message_object, thread_id, thread_type, **kwargs):
         matchList = MainRegex.findall(message_object.text)
         # Have I been called? if not, do nothing.
+        if 'mtgbot:' in message_object.text:
+            return
         if len(matchList) != 0:
             for name in matchList:
-                cardData = cardFetch(name)
+                alteredName = nicknames(name)
+                if alteredName != name:
+                    imageUrl = scryfall(alteredName)
+                    if imageUrl:
+                        cardData = {'imageurl': imageUrl, 'name': name}
+                else:
+                    cardData = cardFetch(alteredName)
                 if cardData:
                     # if cardData exists, at least one card was found! fire away!
-                    #obviously, no gurantee it will be the card you wanted!
-                    self.sendRemoteImage(cardData['imageurl'],message=Message(text='mtgbot: '+cardData['name']), thread_id=thread_id, thread_type=thread_type)
+                    # obviously, no gurantee it will be the card you wanted!
+                    self.sendRemoteImage(cardData['imageurl'], message=Message(
+                        text='mtgbot: {}'.format(cardData['name'])), thread_id=thread_id, thread_type=thread_type)
+                else:
+                    self.send(message=Message(text='mtgbot: No card found for {}'.format(
+                        name)), thread_id=thread_id, thread_type=thread_type)
 
 
-client = MtgBot(YOUR_FACEBOOK_EMAIL, YOUR_FACEBOOK_PASSWORD)
+client = MtgBot(YOUR_FACEBOOK_USERNAME, YOUR_FACEBOOK_PASSWORD)
 client.listen()
