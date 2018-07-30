@@ -32,14 +32,14 @@ def mtgJson(name):
 
 
 
-def LukesCards():
+def LukesCards(LUKE_ITERATOR):
     cards = [
         'Birthing Pod',
         'Gitaxian Probe',
         'Stoneforge Mystic',
         'Treasure Cruise',
         'Dig Through Time',
-        'Ancient Den'',
+        'Ancient Den',
         'Blazing Shoal',
         'Chrome Mox',
         'Cloudpost',
@@ -68,14 +68,15 @@ def LukesCards():
         'Umezawa\'s Jitte',
         'Vault of Whispers',
     ]
-    LUKE_ITERATOR += 1
-    return cards[LUKE_ITERATOR]
+    index = LUKE_ITERATOR % len(cards)
+    return (cards[index],LUKE_ITERATOR)
 
 
 
-def nicknames(name):
-    if name == 'luke':
-        return LukesCards()
+def nicknames(name, LUKE_ITERATOR):
+    if name.lower() == 'luke':
+        LUKE_ITERATOR += 1
+        return LukesCards(LUKE_ITERATOR)
     try:
         nicks = {"bob": "Dark Confidant",
                  "gary": "Gray Merchant of Asphodel",
@@ -116,7 +117,7 @@ def nicknames(name):
                  "lotv": "Liliana of the Veil",
                  "jarvis": "Reclusive Artificer"
                  }
-        return nicks[name.lower()]
+        return (nicks[name.lower()], LUKE_ITERATOR)
     except KeyError:
         return name
 
@@ -173,6 +174,10 @@ def cardFetch(name):
 
 
 class MtgBot(Client):
+    def __init__(self, username,password):
+        super().__init__(username,password)
+        self.LUKE_ITERATOR = -1
+
     def _uploadImage(self, image_path, data, mimetype):
         # mimetype seems a but flakey, force it to be image/jpeg
         return super(MtgBot, self)._uploadImage(image_path, data, "image/jpeg")
@@ -184,7 +189,7 @@ class MtgBot(Client):
             return
         if len(matchList) != 0:
             for name in matchList:
-                alteredName = nicknames(name)
+                alteredName,self.LUKE_ITERATOR = nicknames(name, self.LUKE_ITERATOR)
                 if alteredName != name:
                     imageUrl = scryfall(alteredName)
                     if imageUrl:
