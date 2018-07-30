@@ -11,6 +11,8 @@ from fbchat.models import Message
 YOUR_FACEBOOK_USERNAME = ""
 YOUR_FACEBOOK_PASSWORD = ""
 
+LUKE_ITERATOR = 0
+
 with open('credentials.txt') as fyl:
     YOUR_FACEBOOK_USERNAME = fyl.readline().strip()
     YOUR_FACEBOOK_PASSWORD = fyl.readline().strip()
@@ -29,7 +31,51 @@ def mtgJson(name):
         return False
 
 
+
+def LukesCards():
+    cards = [
+        'Birthing Pod',
+        'Gitaxian Probe',
+        'Stoneforge Mystic',
+        'Treasure Cruise',
+        'Dig Through Time',
+        'Ancient Den'',
+        'Blazing Shoal',
+        'Chrome Mox',
+        'Cloudpost',
+        'Dark Depths',
+        'Deathrite Shaman',
+        'Dread Return',
+        'Eye of Ugin',
+        'Glimpse of Nature',
+        'Golgari Grave-Troll',
+        'Great Furnace',
+        'Green Sun\'s Zenith',
+        'Hypergenesis',
+        'Mental Misstep',
+        'Ponder',
+        'Preordain',
+        'Punishing Fire',
+        'Rite of Flame',
+        'Seat of the Synod',
+        'Second Sunrise',
+        'Seething Song',
+        'Sensei\'s Divining Top',
+        'Skullclamp',
+        'Splinter Twin',
+        'Summer Bloom',
+        'Tree of Tales',
+        'Umezawa\'s Jitte',
+        'Vault of Whispers',
+    ]
+    LUKE_ITERATOR += 1
+    return cards[LUKE_ITERATOR]
+
+
+
 def nicknames(name):
+    if name == 'luke':
+        return LukesCards()
     try:
         nicks = {"bob": "Dark Confidant",
                  "gary": "Gray Merchant of Asphodel",
@@ -56,7 +102,6 @@ def nicknames(name):
                  "gitgud frog": "The Gitrog Monster",
                  "poyser": "Doomed Traveler",
                  "bourne": "Look at me I'm the DCI",
-                 "luke": "Splinter Twin",
                  "ged": "Grimgrin",
                  "simoon": "Omniscience",
                  "lyndon": "Rakdos, Lord",
