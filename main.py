@@ -119,7 +119,7 @@ def nicknames(name, LUKE_ITERATOR):
                  }
         return (nicks[name.lower()], LUKE_ITERATOR)
     except KeyError:
-        return name
+        return (name, LUKE_ITERATOR)
 
 
 def properNames(corseMatch, name):
@@ -189,6 +189,7 @@ class MtgBot(Client):
             return
         if len(matchList) != 0:
             for name in matchList:
+                print(nicknames(name,self.LUKE_ITERATOR))
                 alteredName,self.LUKE_ITERATOR = nicknames(name, self.LUKE_ITERATOR)
                 if alteredName != name:
                     imageUrl = scryfall(alteredName)
