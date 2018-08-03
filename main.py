@@ -48,6 +48,7 @@ class MtgBot(Client):
                             text='mtgbot: {}'.format(cardData['name'])), thread_id=thread_id, thread_type=thread_type)
 
                     else:
+                        print('sending remote image')
                         self.sendRemoteImage(cardData['imageurls'][0], message=Message(
                             text='mtgbot: {}'.format(cardData['name'])), thread_id=thread_id, thread_type=thread_type)
                 else:

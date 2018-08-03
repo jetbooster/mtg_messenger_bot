@@ -10,20 +10,25 @@ import utils
 def scryfall(name):
     try:
         scryfall = json.loads(get("https://api.scryfall.com/cards/search?q={}".format(name)).text)
-        # get the normal sized image, strip query param
-        if (scryfall['data'][0].get('card_faces')):
-            card_face_urls = [card_face['image_uris']['normal'].split('?')[0] for card_face in scryfall['data'][0]['card_faces']]
+        # Prioritise full name match within results, otherwise first result.
+        index = 0
+        for card in scryfall['data']:
+            if name == card['name']:
+                index = scryfall['data'].index(card)
+
+        if (scryfall['data'][index].get('card_faces')):
+            card_face_urls = [card_face['image_uris']['normal'].split('?')[0] for card_face in scryfall['data'][index]['card_faces']]
             return ({
                 'imageurls': card_face_urls,
-                'name': scryfall['data'][0]['name'],
+                'name': scryfall['data'][index]['name'],
                 'dualfaced': True
             })
 
 
         else:
             return ({
-                'imageurls': [scryfall['data'][0]['image_uris']['normal'].split("?")[0]],
-                'name': scryfall['data'][0]['name'],
+                'imageurls': [scryfall['data'][index]['image_uris']['normal'].split("?")[0]],
+                'name': scryfall['data'][index]['name'],
                 'dualfaced': False
             })
     except Exception as e:
