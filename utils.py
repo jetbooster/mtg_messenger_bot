@@ -45,7 +45,7 @@ class LukesCards():
         ]
     def getNextCard(self):
         self.ITERATOR += 1
-        index = ITERATOR % len(self.cards)
+        index = self.ITERATOR % len(self.cards)
         return cards[index]
 
 
