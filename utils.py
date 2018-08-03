@@ -45,8 +45,9 @@ class LukesCards():
         ]
     def getNextCard(self):
         self.ITERATOR += 1
-        index = ITERATOR % len(self.cards)
-        return cards[index]
+        index = self.ITERATOR % len(self.cards)
+        print("Sending a card from Modern banlist")
+        return self.cards[index]
 
 
 
@@ -91,6 +92,7 @@ def nicknames(name):
                  "lotv": "Liliana of the Veil",
                  "jarvis": "Reclusive Artificer"
                  }
+        print("returning a nickname")
         return nicks[name.lower()]
     except KeyError:
         return name
