@@ -13,7 +13,7 @@ def scryfall(name):
         # Prioritise full name match within results, otherwise first result.
         index = 0
         for card in scryfall['data']:
-            if name == card['name']:
+            if name.lower() == card['name'].lower():
                 index = scryfall['data'].index(card)
 
         if (scryfall['data'][index].get('card_faces')):
