@@ -1,2 +1,4 @@
 credentials.txt
 nohup.out
+cache
+__pycache__
